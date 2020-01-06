@@ -5,6 +5,7 @@ var assign = require('object-assign'),
 	createClass = require('create-react-class'),
 	moment = require('moment'),
 	React = require('react'),
+        ReactDOM = require('react-dom'),
 	CalendarContainer = require('./src/CalendarContainer'),
 	onClickOutside = require('react-onclickoutside').default
 	;
@@ -42,7 +43,8 @@ var Datetime = createClass({
 		open: TYPES.bool,
 		strictParsing: TYPES.bool,
 		closeOnSelect: TYPES.bool,
-		closeOnTab: TYPES.bool
+		closeOnTab: TYPES.bool,
+		direction: TYPES.oneOf(['down', 'up'])
 	},
 
 	getInitialState: function() {
@@ -144,6 +146,22 @@ var Datetime = createClass({
 
 		return formats;
 	},
+	
+	componentDidUpdate: function() {
+		this.updatePickerPosition();
+	  },
+	
+	  componentDidMount: function() {
+		this.updatePickerPosition();
+	  },
+	
+	  updatePickerPosition: function () {
+		if (this.state.open && this.props.direction === 'up') {
+		  var parent = ReactDOM.findDOMNode(this);
+		  var picker = parent.querySelector('.rdtPicker');
+		  picker.style.top = '-' + picker.offsetHeight + 'px';
+		}
+	  },
 
 	componentWillReceiveProps: function( nextProps ) {
 		var formats = this.getFormats( nextProps ),
@@ -528,7 +546,8 @@ Datetime.defaultProps = {
 	strictParsing: true,
 	closeOnSelect: false,
 	closeOnTab: true,
-	utc: false
+	utc: false,
+	direction : "bottom"
 };
 
 // Make moment accessible through the Datetime class
